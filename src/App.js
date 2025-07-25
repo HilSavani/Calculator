@@ -373,43 +373,42 @@ function App() {
             <section className="form-section">
               <div className="section-title">Price breakdown:</div>
               <div className="output-box">
-                <table className="price-table">
+                <div className="metal-prices-list">
+                  <div className="metal-price-item">10Kt metal price: {price10Kt !== '--' ? `$${price10Kt} USD` : '--'}</div>
+                  <div className="metal-price-item">14Kt metal price: {price14Kt !== '--' ? `$${price14Kt} USD` : '--'}</div>
+                  <div className="metal-price-item">18Kt metal price: {price18Kt !== '--' ? `$${price18Kt} USD` : '--'}</div>
+                  <div className="metal-price-item">Platinum metal price: {pricePlatinum !== '--' ? `$${pricePlatinum} USD` : '--'}</div>
+                </div>
+                <div className="stone-prices-list">
+                  <div className="actual-center-stone">Actual center stone price: {actualCenterStonePrice !== '--' ? `$${actualCenterStonePrice} USD` : '--'}</div>
+                  <div className="side-stone-price">Side stone price: {sideStonePrice !== '--' ? `$${sideStonePrice} USD` : '--'}</div>
+                </div>
+                <table className="price-table final-product-table">
                   <thead>
                     <tr>
                       <th>Metal</th>
-                      <th>Price</th>
-                      <th>Total (Metal + Center + Side)</th>
+                      <th>Final Product Price</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
                       <td>10Kt</td>
-                      <td>{price10Kt !== '--' ? `$${price10Kt} USD` : '--'}</td>
                       <td>{getTotalPrice(price10Kt) !== '--' ? `$${getTotalPrice(price10Kt)} USD` : '--'}</td>
                     </tr>
                     <tr>
                       <td>14Kt</td>
-                      <td>{price14Kt !== '--' ? `$${price14Kt} USD` : '--'}</td>
                       <td>{getTotalPrice(price14Kt) !== '--' ? `$${getTotalPrice(price14Kt)} USD` : '--'}</td>
                     </tr>
                     <tr>
                       <td>18Kt</td>
-                      <td>{price18Kt !== '--' ? `$${price18Kt} USD` : '--'}</td>
                       <td>{getTotalPrice(price18Kt) !== '--' ? `$${getTotalPrice(price18Kt)} USD` : '--'}</td>
                     </tr>
                     <tr>
                       <td>Platinum</td>
-                      <td>{pricePlatinum !== '--' ? `$${pricePlatinum} USD` : '--'}</td>
                       <td>{getTotalPrice(pricePlatinum) !== '--' ? `$${getTotalPrice(pricePlatinum)} USD` : '--'}</td>
                     </tr>
                   </tbody>
                 </table>
-                <div className="actual-center-stone">
-                  Actual center stone price: {actualCenterStonePrice !== '--' ? `$${actualCenterStonePrice} USD` : '--'}
-                </div>
-                <div className="side-stone-price">
-                  Side stone price: {sideStonePrice !== '--' ? `$${sideStonePrice} USD` : '--'}
-                </div>
               </div>
             </section>
           )}

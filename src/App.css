@@ -254,6 +254,63 @@ input[type="checkbox"] {
   width: auto;
 }
 
+.metal-prices-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+  background: #f7f7fa;
+  padding: 12px 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.metal-price-item {
+  font-weight: 500;
+  color: #3a3a3a;
+  font-size: 1rem;
+}
+.stone-prices-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+  background: #eaf6ff;
+  padding: 12px 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.actual-center-stone, .side-stone-price {
+  font-weight: 500;
+  color: #1a4d7a;
+  font-size: 1rem;
+}
+.final-product-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 0;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.final-product-table th, .final-product-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #f0f0f0;
+}
+.final-product-table th {
+  background: #f0f4fa;
+  font-size: 1.08rem;
+  color: #2a2a2a;
+}
+.final-product-table tr:last-child td {
+  border-bottom: none;
+}
+.final-product-table td {
+  font-size: 1.05rem;
+  color: #2a2a2a;
+}
+
 @media (max-width: 900px) {
   .main-content {
     flex-direction: column;
@@ -308,5 +365,19 @@ input[type="checkbox"] {
     flex-direction: column;
     gap: 18px;
     align-items: flex-start;
+  }
+}
+
+@media (max-width: 700px) {
+  .output-box {
+    padding: 0 2px;
+  }
+  .metal-prices-list, .stone-prices-list {
+    padding: 10px 6px;
+    font-size: 0.98rem;
+  }
+  .final-product-table th, .final-product-table td {
+    padding: 8px 6px;
+    font-size: 0.98rem;
   }
 } 
