@@ -15,14 +15,16 @@ function App() {
   const [additionalDiscount, setAdditionalDiscount] = useState('');
   const [discountError, setDiscountError] = useState('');
   const [showOutput, setShowOutput] = useState(false);
+  const [showDocumentation, setShowDocumentation] = useState(false);
+  const [showAllPricing, setShowAllPricing] = useState(false);
 
   // Price calculation logic (move this OUTSIDE JSX)
   const parsedWeight = parseFloat(metalWeight);
   const isValidWeight = !isNaN(parsedWeight) && parsedWeight > 0;
-  const price10Kt = isValidWeight ? (2 * 5200 * parsedWeight / 90).toFixed(2) : '--';
-  const price14Kt = isValidWeight ? (2 * 7000 * parsedWeight / 90).toFixed(2) : '--';
-  const price18Kt = isValidWeight ? (2 * 8500 * parsedWeight / 90).toFixed(2) : '--';
-  const pricePlatinum = isValidWeight ? (2 * 9000 * parsedWeight / 90).toFixed(2) : '--';
+  const price10Kt = isValidWeight ? (2 * 5200 * parsedWeight / 85).toFixed(2) : '--';
+  const price14Kt = isValidWeight ? (2 * 7000 * parsedWeight / 85).toFixed(2) : '--';
+  const price18Kt = isValidWeight ? (2 * 8500 * parsedWeight / 85).toFixed(2) : '--';
+  const pricePlatinum = isValidWeight ? (2 * 9000 * parsedWeight / 85).toFixed(2) : '--';
 
   // Helper: Calculate actual center stone price based on input
   function new_price(price) {
@@ -223,8 +225,8 @@ function App() {
         {/* Left container: Form sections */}
         <div className="left-container">
           <div className="continuous-form">
-            {/* Section 1: Metal type */}
-            <section className="form-section">
+            {/* Section 1: Metal type - HIDDEN */}
+            <section className="form-section hidden-section">
               <div className="section-title">Metal type</div>
               <div className="radio-group inline">
                 <label>
@@ -324,65 +326,69 @@ function App() {
               />
               {sideStoneError && <div className="error-message">{sideStoneError}</div>}
             </section>
+            {/* Section 5: Platform */}
+            <section className="form-section">
+              <div className="section-title">Platform <RequiredStar /></div>
+              <div className="checkbox-group">
+                <label>
+                  <input
+                    type="checkbox"
+                    name="Etsy"
+                    checked={platforms.Etsy}
+                    onChange={handlePlatformChange}
+                  />
+                  Etsy
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    name="Shopify"
+                    checked={platforms.Shopify}
+                    onChange={handlePlatformChange}
+                  />
+                  Shopify
+                </label>
+              </div>
+              {platformError && <div className="error-message">{platformError}</div>}
+            </section>
+            {/* Section 6: Additional discount */}
+            <section className="form-section">
+              <div className="section-title">Additional discount (If applicable)</div>
+              <input
+                className={`input-box${discountError ? ' error' : ''}`}
+                type="text"
+                inputMode="numeric"
+                placeholder="Discount in % - like 20"
+                value={additionalDiscount}
+                onChange={handleDiscountChange}
+                onBlur={handleDiscountBlur}
+                autoComplete="off"
+              />
+              {discountError && <div className="error-message">{discountError}</div>}
+            </section>
+            {/* Section 7: Documentation */}
+            <section className="form-section">
+              <div className="section-title">
+                Pricing methodology
+                <button 
+                  type="button"
+                  className="info-button"
+                  onClick={() => setShowDocumentation(true)}
+                  aria-label="Open pricing documentation"
+                >
+                  i
+                </button>
+              </div>
+            </section>
           </div>
         </div>
-        {/* Right container: Platform and Discount */}
+        {/* Right container: Output only */}
         <div className="right-container">
-          {/* Section 1: Platform */}
-          <section className="form-section">
-            <div className="section-title">Platform <RequiredStar /></div>
-            <div className="checkbox-group">
-              <label>
-                <input
-                  type="checkbox"
-                  name="Etsy"
-                  checked={platforms.Etsy}
-                  onChange={handlePlatformChange}
-                />
-                Etsy
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  name="Shopify"
-                  checked={platforms.Shopify}
-                  onChange={handlePlatformChange}
-                />
-                Shopify
-              </label>
-            </div>
-            {platformError && <div className="error-message">{platformError}</div>}
-          </section>
-          {/* Section 2: Additional discount */}
-          <section className="form-section">
-            <div className="section-title">Additional discount (If applicable)</div>
-            <input
-              className={`input-box${discountError ? ' error' : ''}`}
-              type="text"
-              inputMode="numeric"
-              placeholder="Discount in % - like 20"
-              value={additionalDiscount}
-              onChange={handleDiscountChange}
-              onBlur={handleDiscountBlur}
-              autoComplete="off"
-            />
-            {discountError && <div className="error-message">{discountError}</div>}
-          </section>
           {/* Section 3: Price breakdown (output) */}
           {showOutput && (
             <section className="form-section">
               <div className="section-title">Price breakdown:</div>
               <div className="output-box">
-                <div className="metal-prices-list">
-                  <div className="metal-price-item">10Kt metal price: {price10Kt !== '--' ? `$${price10Kt} USD` : '--'}</div>
-                  <div className="metal-price-item">14Kt metal price: {price14Kt !== '--' ? `$${price14Kt} USD` : '--'}</div>
-                  <div className="metal-price-item">18Kt metal price: {price18Kt !== '--' ? `$${price18Kt} USD` : '--'}</div>
-                  <div className="metal-price-item">Platinum metal price: {pricePlatinum !== '--' ? `$${pricePlatinum} USD` : '--'}</div>
-                </div>
-                <div className="stone-prices-list">
-                  <div className="actual-center-stone">Actual center stone price: {actualCenterStonePrice !== '--' ? `$${actualCenterStonePrice} USD` : '--'}</div>
-                  <div className="side-stone-price">Side stone price: {sideStonePrice !== '--' ? `$${sideStonePrice} USD` : '--'}</div>
-                </div>
                 <table className="price-table final-product-table">
                   <thead>
                     <tr>
@@ -409,6 +415,16 @@ function App() {
                     </tr>
                   </tbody>
                 </table>
+                <div className="stone-prices-list">
+                  <div className="actual-center-stone">Actual center stone price: {actualCenterStonePrice !== '--' ? `$${actualCenterStonePrice} USD` : '--'}</div>
+                  <div className="side-stone-price">Side stone price: {sideStonePrice !== '--' ? `$${sideStonePrice} USD` : '--'}</div>
+                </div>
+                <div className="metal-prices-list">
+                  <div className="metal-price-item">10Kt metal price: {price10Kt !== '--' ? `$${price10Kt} USD` : '--'}</div>
+                  <div className="metal-price-item">14Kt metal price: {price14Kt !== '--' ? `$${price14Kt} USD` : '--'}</div>
+                  <div className="metal-price-item">18Kt metal price: {price18Kt !== '--' ? `$${price18Kt} USD` : '--'}</div>
+                  <div className="metal-price-item">Platinum metal price: {pricePlatinum !== '--' ? `$${pricePlatinum} USD` : '--'}</div>
+                </div>
               </div>
             </section>
           )}
@@ -417,6 +433,150 @@ function App() {
       {/* Submit button at the bottom of the page */}
       <label htmlFor="main-content" className="visually-hidden">Submit form</label>
       <button className="submit-btn" type="submit" form="main-content">Submit</button>
+
+      {/* Documentation Modal */}
+      {showDocumentation && (
+        <div className="modal-overlay" onClick={() => setShowDocumentation(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Pricing Methodology Documentation</h2>
+              <button 
+                className="modal-close"
+                onClick={() => setShowDocumentation(false)}
+                aria-label="Close documentation"
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <section className="doc-section">
+                <h3>🏗️ Metal Pricing Formula</h3>
+                <div className="formula-box">
+                  <strong>Metal Price = 2 × (Metal Rate per Gram) × (Weight in Grams) ÷ 85</strong>
+                </div>
+                <div className="metal-rates">
+                  <h4>Current Metal Rates (INR):</h4>
+                  <ul>
+                    <li><strong>10Kt Gold:</strong> ₹5,200 per gram</li>
+                    <li><strong>14Kt Gold:</strong> ₹7,000 per gram</li>
+                    <li><strong>18Kt Gold:</strong> ₹8,500 per gram</li>
+                    <li><strong>950 Platinum:</strong> ₹9,000 per gram</li>
+                  </ul>
+                </div>
+                <p className="note">Note: The division by 85 converts the INR price to USD for final pricing.</p>
+              </section>
+
+              <section className="doc-section">
+                <h3>💎 Center Stone Pricing</h3>
+                <p>We apply a multiplier to the VDB (Virtual Diamond Bank) price based on the price range:</p>
+                <div className="pricing-table-container">
+                  <table className="pricing-table">
+                    <thead>
+                      <tr>
+                        <th>VDB Price Range</th>
+                        <th>Multiplier</th>
+                        <th>Example</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>$1 - $100</td><td>3.0x</td><td>$50 → $150</td></tr>
+                      <tr><td>$101 - $200</td><td>2.95x</td><td>$150 → $442.50</td></tr>
+                      <tr><td>$201 - $300</td><td>2.90x</td><td>$250 → $725</td></tr>
+                      <tr><td>$301 - $400</td><td>2.85x</td><td>$350 → $997.50</td></tr>
+                      <tr><td>$401 - $500</td><td>2.80x</td><td>$450 → $1,260</td></tr>
+                      {showAllPricing && (
+                        <>
+                          <tr><td>$501 - $600</td><td>2.75x</td><td>$550 → $1,512.50</td></tr>
+                          <tr><td>$601 - $700</td><td>2.70x</td><td>$650 → $1,755</td></tr>
+                          <tr><td>$701 - $800</td><td>2.65x</td><td>$750 → $1,987.50</td></tr>
+                          <tr><td>$801 - $900</td><td>2.60x</td><td>$850 → $2,210</td></tr>
+                          <tr><td>$901 - $1,000</td><td>2.55x</td><td>$950 → $2,422.50</td></tr>
+                          <tr><td>$1,001 - $1,100</td><td>2.50x</td><td>$1,050 → $2,625</td></tr>
+                          <tr><td>$1,101 - $1,200</td><td>2.45x</td><td>$1,150 → $2,817.50</td></tr>
+                          <tr><td>$1,201 - $1,300</td><td>2.40x</td><td>$1,250 → $3,000</td></tr>
+                          <tr><td>$1,301 - $1,400</td><td>2.35x</td><td>$1,350 → $3,172.50</td></tr>
+                          <tr><td>$1,401 - $1,500</td><td>2.30x</td><td>$1,450 → $3,335</td></tr>
+                          <tr><td>$1,501 - $1,600</td><td>2.25x</td><td>$1,550 → $3,487.50</td></tr>
+                          <tr><td>$1,601 - $1,700</td><td>2.20x</td><td>$1,650 → $3,630</td></tr>
+                          <tr><td>$1,701 - $1,800</td><td>2.15x</td><td>$1,750 → $3,762.50</td></tr>
+                          <tr><td>$1,801 - $1,900</td><td>2.10x</td><td>$1,850 → $3,885</td></tr>
+                          <tr><td>$1,901 - $2,000</td><td>2.05x</td><td>$1,950 → $3,997.50</td></tr>
+                          <tr><td>$2,001 - $2,500</td><td>2.00x</td><td>$2,250 → $4,500</td></tr>
+                          <tr><td>$2,501 - $3,000</td><td>1.97x</td><td>$2,750 → $5,417.50</td></tr>
+                          <tr><td>$3,001 - $3,500</td><td>1.94x</td><td>$3,250 → $6,305</td></tr>
+                          <tr><td>$3,501 - $4,000</td><td>1.91x</td><td>$3,750 → $7,162.50</td></tr>
+                          <tr><td>$4,001 - $4,500</td><td>1.88x</td><td>$4,250 → $7,990</td></tr>
+                          <tr><td>$4,501 - $5,000</td><td>1.85x</td><td>$4,750 → $8,787.50</td></tr>
+                          <tr><td>$5,001 - $5,500</td><td>1.82x</td><td>$5,250 → $9,555</td></tr>
+                          <tr><td>$5,501 - $6,000</td><td>1.78x</td><td>$5,750 → $10,235</td></tr>
+                          <tr><td>$6,001 - $6,500</td><td>1.75x</td><td>$6,250 → $10,937.50</td></tr>
+                          <tr><td>$6,501 - $7,000</td><td>1.72x</td><td>$6,750 → $11,610</td></tr>
+                          <tr><td>$7,001 - $7,500</td><td>1.69x</td><td>$7,250 → $12,252.50</td></tr>
+                          <tr><td>$7,501 - $8,000</td><td>1.66x</td><td>$7,750 → $12,865</td></tr>
+                          <tr><td>$8,001 - $8,500</td><td>1.63x</td><td>$8,250 → $13,447.50</td></tr>
+                          <tr><td>$8,501 - $9,000</td><td>1.60x</td><td>$8,750 → $14,000</td></tr>
+                          <tr><td>$9,001 - $9,500</td><td>1.57x</td><td>$9,250 → $14,522.50</td></tr>
+                          <tr><td>$9,501 - $10,000</td><td>1.54x</td><td>$9,750 → $15,015</td></tr>
+                          <tr><td>$10,000+</td><td>1.50x</td><td>$15,000 → $22,500</td></tr>
+                        </>
+                      )}
+                    </tbody>
+                  </table>
+                  <div className="load-more-container">
+                    <button 
+                      className="load-more-btn"
+                      onClick={() => setShowAllPricing(!showAllPricing)}
+                    >
+                      {showAllPricing ? 'Show less' : 'Show more'}
+                    </button>
+                  </div>
+                </div>
+                <p className="note">Higher value stones have lower multipliers to maintain competitive pricing.</p>
+              </section>
+
+              <section className="doc-section">
+                <h3>✨ Side Stone Pricing</h3>
+                <div className="formula-box">
+                  <strong>Side Stone Price = Weight in Carats × $250</strong>
+                </div>
+                <p>Example: 0.5 carats of side stones = 0.5 × $250 = $125</p>
+              </section>
+
+              <section className="doc-section">
+                <h3>💰 Final Price Calculation</h3>
+                <div className="formula-box">
+                  <strong>Total Price = Metal Price + Center Stone Price + Side Stone Price</strong>
+                </div>
+                <p>If a discount is applied:</p>
+                <div className="formula-box">
+                  <strong>Final Price = Total Price ÷ (100 - Discount%) × 100</strong>
+                </div>
+                <p>Example: 20% discount on $1,000 = $1,000 ÷ 80 × 100 = $1,250</p>
+              </section>
+
+              <section className="doc-section">
+                <h3>📋 Example Calculation</h3>
+                <div className="example-calculation">
+                  <p><strong>Inputs:</strong></p>
+                  <ul>
+                    <li>14Kt Gold, 2.5 grams</li>
+                    <li>Center stone: $800 VDB price</li>
+                    <li>Side stones: 0.3 carats</li>
+                    <li>No discount</li>
+                  </ul>
+                  <p><strong>Calculation:</strong></p>
+                  <ul>
+                    <li>Metal: 2 × ₹7,000 × 2.5 ÷ 85 = $411.76</li>
+                    <li>Center stone: $800 × 2.65 = $2,120</li>
+                    <li>Side stones: 0.3 × $250 = $75</li>
+                    <li><strong>Total: $411.76 + $2,120 + $75 = $2,606.76</strong></li>
+                  </ul>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
