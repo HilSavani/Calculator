@@ -29,7 +29,7 @@ function App() {
     livePrice: 6000,
     labourCharge: 2000,
     purity: 0.95,
-    markup: 2.5,
+    markup: 3,
   };
   const SIDE_STONE_BASE_PRICE = 250;
   const SHIPPING_CHARGE_USD = 100;
@@ -47,6 +47,7 @@ function App() {
   const computeGoldBasePrice = (purityFactor) => (
     (GOLD_CONFIG.livePrice * purityFactor) + GOLD_CONFIG.labourCharge
   );
+  const platinumBasePrice = (PLATINUM_CONFIG.livePrice * PLATINUM_CONFIG.purity) + PLATINUM_CONFIG.labourCharge;
 
   const computeMetalPrice = (basePrice, markup) => (
     isValidWeight
@@ -67,7 +68,7 @@ function App() {
     GOLD_CONFIG.markup,
   );
   const pricePlatinum = computeMetalPrice(
-    (PLATINUM_CONFIG.livePrice * PLATINUM_CONFIG.purity) + PLATINUM_CONFIG.labourCharge,
+    platinumBasePrice,
     PLATINUM_CONFIG.markup,
   );
 
@@ -118,10 +119,12 @@ function App() {
     ? new_price(centerStoneInput).toFixed(2)
     : '--';
 
-  // Calculate side stone price
+  // Calculate side stone price (optional)
   const sideStoneInput = parseFloat(sideStoneWeight);
-  const sideStonePrice = (!isNaN(sideStoneInput) && sideStoneInput > 0)
-    ? (sideStoneInput * SIDE_STONE_BASE_PRICE).toFixed(2)
+  const hasSideStone = !isNaN(sideStoneInput) && sideStoneInput > 0;
+  const sideStoneAmount = hasSideStone ? (sideStoneInput * SIDE_STONE_BASE_PRICE) : 0;
+  const sideStonePrice = hasSideStone
+    ? sideStoneAmount.toFixed(2)
     : '--';
 
   // Metal weight: only numbers, up to 2 decimals
@@ -164,12 +167,12 @@ function App() {
     }
   };
 
-  // Side stone weight: only numbers, up to 2 decimals
+  // Side stone weight: optional, only numbers, up to 2 decimals
   const handleSideStoneChange = (e) => {
     const value = e.target.value;
     if (/^\d*(\.\d{0,2})?$/.test(value)) {
       setSideStoneWeight(value);
-      if (value === '' || parseFloat(value) <= 0) {
+      if (value !== '' && parseFloat(value) <= 0) {
         setSideStoneError('Please enter a value greater than 0');
       } else {
         setSideStoneError('');
@@ -177,7 +180,10 @@ function App() {
     }
   };
   const handleSideStoneBlur = () => {
-    if (sideStoneWeight === '' || parseFloat(sideStoneWeight, 10) <= 0) {
+    if (
+      sideStoneWeight !== '' &&
+      (isNaN(parseFloat(sideStoneWeight)) || parseFloat(sideStoneWeight) <= 0)
+    ) {
       setSideStoneError('Please enter a value greater than 0');
     } else {
       setSideStoneError('');
@@ -230,7 +236,10 @@ function App() {
       setCenterStoneError('Please enter a valid price');
       valid = false;
     }
-    if (sideStoneWeight === '' || isNaN(Number(sideStoneWeight)) || parseFloat(sideStoneWeight) <= 0) {
+    if (
+      sideStoneWeight !== '' &&
+      (isNaN(Number(sideStoneWeight)) || parseFloat(sideStoneWeight) <= 0)
+    ) {
       setSideStoneError('Please enter a value greater than 0');
       valid = false;
     }
@@ -252,8 +261,8 @@ function App() {
   function getTotalPrice(metalPrice) {
     const metal = parseFloat(metalPrice);
     const center = parseFloat(actualCenterStonePrice);
-    const side = parseFloat(sideStonePrice);
-    if (isNaN(metal) || isNaN(center) || isNaN(side)) return '--';
+    const side = hasSideStone ? sideStoneAmount : 0;
+    if (isNaN(metal) || isNaN(center)) return '--';
     let total = metal + center + side;
     const discount = parseInt(additionalDiscount, 10);
     if (!isNaN(discount) && discount > 0 && discount < 100) {
@@ -368,11 +377,11 @@ function App() {
               </div>
               {centerStoneError && <div className="error-message">{centerStoneError}</div>}
             </section>
-            {/* Section 4: Side stone weight */}
+            {/* Section 4: Side stone weight (optional) */}
             <section className="form-section">
               <div className="inline-field">
                 <label className="section-title inline-label" htmlFor="side-stone-weight">
-                  Side stone weight <RequiredStar />
+                  Side stone weight (Optional)
                 </label>
                 <input
                   id="side-stone-weight"
@@ -528,18 +537,22 @@ function App() {
               <section className="doc-section">
                 <h3>🏗️ Metal Pricing Formula</h3>
                 <div className="formula-box">
-                  <strong>Metal Price = 2 × (Metal Rate per Gram) × (Weight in Grams) ÷ 85</strong>
+                  <strong>
+                    Metal Price = {GOLD_CONFIG.markup} × (Metal Rate per Gram) × (Weight in Grams) ÷ {USD_TO_INR}
+                  </strong>
                 </div>
                 <div className="metal-rates">
                   <h4>Current Metal Rates (INR):</h4>
                   <ul>
-                    <li><strong>10Kt Gold:</strong> ₹5,200 per gram</li>
-                    <li><strong>14Kt Gold:</strong> ₹7,000 per gram</li>
-                    <li><strong>18Kt Gold:</strong> ₹8,500 per gram</li>
-                    <li><strong>950 Platinum:</strong> ₹9,000 per gram</li>
+                    <li><strong>10Kt Gold:</strong> ₹{computeGoldBasePrice(GOLD_PURITY_FACTORS['10Kt']).toFixed(2)} per gram</li>
+                    <li><strong>14Kt Gold:</strong> ₹{computeGoldBasePrice(GOLD_PURITY_FACTORS['14Kt']).toFixed(2)} per gram</li>
+                    <li><strong>18Kt Gold:</strong> ₹{computeGoldBasePrice(GOLD_PURITY_FACTORS['18Kt']).toFixed(2)} per gram</li>
+                    <li><strong>950 Platinum:</strong> ₹{platinumBasePrice.toFixed(2)} per gram</li>
                   </ul>
                 </div>
-                <p className="note">Note: The division by 85 converts the INR price to USD for final pricing.</p>
+                <p className="note">
+                  Note: The division by {USD_TO_INR} converts the INR price to USD for final pricing.
+                </p>
               </section>
 
               <section className="doc-section">
@@ -615,6 +628,7 @@ function App() {
                 <div className="formula-box">
                   <strong>Side Stone Price = Weight in Carats × $250</strong>
                 </div>
+                <p>Side stones are optional—leave the input blank if your design has none.</p>
                 <p>Example: 0.5 carats of side stones = 0.5 × $250 = $125</p>
               </section>
 
