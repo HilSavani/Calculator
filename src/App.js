@@ -29,7 +29,7 @@ function App() {
     livePrice: 6000,
     labourCharge: 2000,
     purity: 0.95,
-    markup: 2.5,
+    markup: 3,
   };
   const SIDE_STONE_BASE_PRICE = 250;
   const SHIPPING_CHARGE_USD = 100;
@@ -47,6 +47,7 @@ function App() {
   const computeGoldBasePrice = (purityFactor) => (
     (GOLD_CONFIG.livePrice * purityFactor) + GOLD_CONFIG.labourCharge
   );
+  const platinumBasePrice = (PLATINUM_CONFIG.livePrice * PLATINUM_CONFIG.purity) + PLATINUM_CONFIG.labourCharge;
 
   const computeMetalPrice = (basePrice, markup) => (
     isValidWeight
@@ -67,7 +68,7 @@ function App() {
     GOLD_CONFIG.markup,
   );
   const pricePlatinum = computeMetalPrice(
-    (PLATINUM_CONFIG.livePrice * PLATINUM_CONFIG.purity) + PLATINUM_CONFIG.labourCharge,
+    platinumBasePrice,
     PLATINUM_CONFIG.markup,
   );
 
@@ -536,18 +537,22 @@ function App() {
               <section className="doc-section">
                 <h3>🏗️ Metal Pricing Formula</h3>
                 <div className="formula-box">
-                  <strong>Metal Price = 2 × (Metal Rate per Gram) × (Weight in Grams) ÷ 85</strong>
+                  <strong>
+                    Metal Price = {GOLD_CONFIG.markup} × (Metal Rate per Gram) × (Weight in Grams) ÷ {USD_TO_INR}
+                  </strong>
                 </div>
                 <div className="metal-rates">
                   <h4>Current Metal Rates (INR):</h4>
                   <ul>
-                    <li><strong>10Kt Gold:</strong> ₹5,200 per gram</li>
-                    <li><strong>14Kt Gold:</strong> ₹7,000 per gram</li>
-                    <li><strong>18Kt Gold:</strong> ₹8,500 per gram</li>
-                    <li><strong>950 Platinum:</strong> ₹9,000 per gram</li>
+                    <li><strong>10Kt Gold:</strong> ₹{computeGoldBasePrice(GOLD_PURITY_FACTORS['10Kt']).toFixed(2)} per gram</li>
+                    <li><strong>14Kt Gold:</strong> ₹{computeGoldBasePrice(GOLD_PURITY_FACTORS['14Kt']).toFixed(2)} per gram</li>
+                    <li><strong>18Kt Gold:</strong> ₹{computeGoldBasePrice(GOLD_PURITY_FACTORS['18Kt']).toFixed(2)} per gram</li>
+                    <li><strong>950 Platinum:</strong> ₹{platinumBasePrice.toFixed(2)} per gram</li>
                   </ul>
                 </div>
-                <p className="note">Note: The division by 85 converts the INR price to USD for final pricing.</p>
+                <p className="note">
+                  Note: The division by {USD_TO_INR} converts the INR price to USD for final pricing.
+                </p>
               </section>
 
               <section className="doc-section">
