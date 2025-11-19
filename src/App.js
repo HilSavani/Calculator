@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './App.css';
 
 function App() {
-  // DEFAULTS: only placeholders, Etsy checked, Metal type 'All' checked
+  // DEFAULTS: only placeholders, Etsy checked
   const [metalType, setMetalType] = useState('All');
   const [metalWeight, setMetalWeight] = useState('');
   const [weightError, setWeightError] = useState('');
@@ -18,13 +18,58 @@ function App() {
   const [showDocumentation, setShowDocumentation] = useState(false);
   const [showAllPricing, setShowAllPricing] = useState(false);
 
-  // Price calculation logic (move this OUTSIDE JSX)
+  // Live prices and charges ---------------------------------------------------
+  const USD_TO_INR = 89;
+  const GOLD_CONFIG = {
+    livePrice: 13000,
+    labourCharge: 1000,
+    markup: 2.5,
+  };
+  const PLATINUM_CONFIG = {
+    livePrice: 6000,
+    labourCharge: 2000,
+    purity: 0.95,
+    markup: 2.5,
+  };
+  const SIDE_STONE_BASE_PRICE = 250;
+  const SHIPPING_CHARGE_USD = 100;
+  const PLATFORM_FEE_RATE = 0.85; // divide by this to cover 15% platform commission
+
+  const GOLD_PURITY_FACTORS = {
+    '10Kt': 10 / 24,
+    '14Kt': 14 / 24,
+    '18Kt': 18 / 24,
+  };
+
   const parsedWeight = parseFloat(metalWeight);
   const isValidWeight = !isNaN(parsedWeight) && parsedWeight > 0;
-  const price10Kt = isValidWeight ? (2 * 5200 * parsedWeight / 85).toFixed(2) : '--';
-  const price14Kt = isValidWeight ? (2 * 7000 * parsedWeight / 85).toFixed(2) : '--';
-  const price18Kt = isValidWeight ? (2 * 8500 * parsedWeight / 85).toFixed(2) : '--';
-  const pricePlatinum = isValidWeight ? (2 * 9000 * parsedWeight / 85).toFixed(2) : '--';
+
+  const computeGoldBasePrice = (purityFactor) => (
+    (GOLD_CONFIG.livePrice * purityFactor) + GOLD_CONFIG.labourCharge
+  );
+
+  const computeMetalPrice = (basePrice, markup) => (
+    isValidWeight
+      ? (markup * basePrice * parsedWeight / USD_TO_INR).toFixed(2)
+      : '--'
+  );
+
+  const price10Kt = computeMetalPrice(
+    computeGoldBasePrice(GOLD_PURITY_FACTORS['10Kt']),
+    GOLD_CONFIG.markup,
+  );
+  const price14Kt = computeMetalPrice(
+    computeGoldBasePrice(GOLD_PURITY_FACTORS['14Kt']),
+    GOLD_CONFIG.markup,
+  );
+  const price18Kt = computeMetalPrice(
+    computeGoldBasePrice(GOLD_PURITY_FACTORS['18Kt']),
+    GOLD_CONFIG.markup,
+  );
+  const pricePlatinum = computeMetalPrice(
+    (PLATINUM_CONFIG.livePrice * PLATINUM_CONFIG.purity) + PLATINUM_CONFIG.labourCharge,
+    PLATINUM_CONFIG.markup,
+  );
 
   // Helper: Calculate actual center stone price based on input
   function new_price(price) {
@@ -76,7 +121,7 @@ function App() {
   // Calculate side stone price
   const sideStoneInput = parseFloat(sideStoneWeight);
   const sideStonePrice = (!isNaN(sideStoneInput) && sideStoneInput > 0)
-    ? (sideStoneInput * 250).toFixed(2)
+    ? (sideStoneInput * SIDE_STONE_BASE_PRICE).toFixed(2)
     : '--';
 
   // Metal weight: only numbers, up to 2 decimals
@@ -214,6 +259,8 @@ function App() {
     if (!isNaN(discount) && discount > 0 && discount < 100) {
       total = (total / (100 - discount)) * 100;
     }
+    total = total / PLATFORM_FEE_RATE;
+    total += SHIPPING_CHARGE_USD;
     return total.toFixed(2);
   }
 
@@ -283,47 +330,62 @@ function App() {
             </section>
             {/* Section 2: Metal weight */}
             <section className="form-section">
-              <div className="section-title">Metal weight <RequiredStar /></div>
-              <input
-                className={`input-box${weightError ? ' error' : ''}`}
-                type="text"
-                inputMode="decimal"
-                placeholder="in grams"
-                value={metalWeight}
-                onChange={handleWeightChange}
-                onBlur={handleWeightBlur}
-                autoComplete="off"
-              />
+              <div className="inline-field">
+                <label className="section-title inline-label" htmlFor="metal-weight">
+                  Metal weight <RequiredStar />
+                </label>
+                <input
+                  id="metal-weight"
+                  className={`input-box inline-input${weightError ? ' error' : ''}`}
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="in grams"
+                  value={metalWeight}
+                  onChange={handleWeightChange}
+                  onBlur={handleWeightBlur}
+                  autoComplete="off"
+                />
+              </div>
               {weightError && <div className="error-message">{weightError}</div>}
             </section>
             {/* Section 3: Center stone price */}
             <section className="form-section">
-              <div className="section-title">Center stone price <RequiredStar /></div>
-              <input
-                className={`input-box${centerStoneError ? ' error' : ''}`}
-                type="text"
-                inputMode="numeric"
-                placeholder="Enter price from VDB"
-                value={centerStonePrice}
-                onChange={handleCenterStoneChange}
-                onBlur={handleCenterStoneBlur}
-                autoComplete="off"
-              />
+              <div className="inline-field">
+                <label className="section-title inline-label" htmlFor="center-stone-price">
+                  Center stone price <RequiredStar />
+                </label>
+                <input
+                  id="center-stone-price"
+                  className={`input-box inline-input${centerStoneError ? ' error' : ''}`}
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="Enter price from VDB"
+                  value={centerStonePrice}
+                  onChange={handleCenterStoneChange}
+                  onBlur={handleCenterStoneBlur}
+                  autoComplete="off"
+                />
+              </div>
               {centerStoneError && <div className="error-message">{centerStoneError}</div>}
             </section>
             {/* Section 4: Side stone weight */}
             <section className="form-section">
-              <div className="section-title">Side stone weight <RequiredStar /></div>
-              <input
-                className={`input-box${sideStoneError ? ' error' : ''}`}
-                type="text"
-                inputMode="decimal"
-                placeholder="(In carats - e.g. : 0.5)"
-                value={sideStoneWeight}
-                onChange={handleSideStoneChange}
-                onBlur={handleSideStoneBlur}
-                autoComplete="off"
-              />
+              <div className="inline-field">
+                <label className="section-title inline-label" htmlFor="side-stone-weight">
+                  Side stone weight <RequiredStar />
+                </label>
+                <input
+                  id="side-stone-weight"
+                  className={`input-box inline-input${sideStoneError ? ' error' : ''}`}
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="(In carats - e.g. : 0.5)"
+                  value={sideStoneWeight}
+                  onChange={handleSideStoneChange}
+                  onBlur={handleSideStoneBlur}
+                  autoComplete="off"
+                />
+              </div>
               {sideStoneError && <div className="error-message">{sideStoneError}</div>}
             </section>
             {/* Section 5: Platform */}
@@ -351,22 +413,33 @@ function App() {
               </div>
               {platformError && <div className="error-message">{platformError}</div>}
             </section>
-            {/* Section 6: Additional discount */}
+            {/* Section 6: Platform fees & shipping info */}
+            <section className="form-section info-note">
+              <div className="info-text">
+                Final prices include a 15% platform commission buffer (pre-shipping totals ÷ {PLATFORM_FEE_RATE}) plus a flat $100 USD shipping charge.
+              </div>
+            </section>
+            {/* Section 7: Additional discount */}
             <section className="form-section">
-              <div className="section-title">Additional discount (If applicable)</div>
-              <input
-                className={`input-box${discountError ? ' error' : ''}`}
-                type="text"
-                inputMode="numeric"
-                placeholder="Discount in % - like 20"
-                value={additionalDiscount}
-                onChange={handleDiscountChange}
-                onBlur={handleDiscountBlur}
-                autoComplete="off"
-              />
+              <div className="inline-field">
+                <label className="section-title inline-label" htmlFor="additional-discount">
+                  Additional discount (If applicable)
+                </label>
+                <input
+                  id="additional-discount"
+                  className={`input-box inline-input${discountError ? ' error' : ''}`}
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="Discount in % - like 20"
+                  value={additionalDiscount}
+                  onChange={handleDiscountChange}
+                  onBlur={handleDiscountBlur}
+                  autoComplete="off"
+                />
+              </div>
               {discountError && <div className="error-message">{discountError}</div>}
             </section>
-            {/* Section 7: Documentation */}
+            {/* Section 8: Documentation */}
             <section className="form-section">
               <div className="section-title">
                 Pricing methodology
@@ -424,6 +497,9 @@ function App() {
                   <div className="metal-price-item">14Kt metal price: {price14Kt !== '--' ? `$${price14Kt} USD` : '--'}</div>
                   <div className="metal-price-item">18Kt metal price: {price18Kt !== '--' ? `$${price18Kt} USD` : '--'}</div>
                   <div className="metal-price-item">Platinum metal price: {pricePlatinum !== '--' ? `$${pricePlatinum} USD` : '--'}</div>
+                </div>
+                <div className="shipping-note">
+                  *Final prices include a 15% platform fee adjustment (÷ {PLATFORM_FEE_RATE}) and a flat $100 USD shipping charge.
                 </div>
               </div>
             </section>
@@ -545,13 +621,19 @@ function App() {
               <section className="doc-section">
                 <h3>💰 Final Price Calculation</h3>
                 <div className="formula-box">
-                  <strong>Total Price = Metal Price + Center Stone Price + Side Stone Price</strong>
+                  <strong>Pre-shipping Total = Metal Price + Center Stone Price + Side Stone Price</strong>
                 </div>
                 <p>If a discount is applied:</p>
                 <div className="formula-box">
-                  <strong>Final Price = Total Price ÷ (100 - Discount%) × 100</strong>
+                  <strong>Discount-adjusted Total = Pre-shipping Total ÷ (100 - Discount%) × 100</strong>
                 </div>
-                <p>Example: 20% discount on $1,000 = $1,000 ÷ 80 × 100 = $1,250</p>
+                <div className="formula-box">
+                  <strong>Platform-adjusted Total = Discount-adjusted Total ÷ {PLATFORM_FEE_RATE}</strong>
+                </div>
+                <div className="formula-box">
+                  <strong>Final Price = Platform-adjusted Total + $100 Shipping</strong>
+                </div>
+                <p>Example: 20% discount on $1,000 pre-shipping total ⇒ ((1000 ÷ 80 × 100) ÷ {PLATFORM_FEE_RATE}) + 100 ≈ $1,570.59.</p>
               </section>
 
               <section className="doc-section">
@@ -569,7 +651,9 @@ function App() {
                     <li>Metal: 2 × ₹7,000 × 2.5 ÷ 85 = $411.76</li>
                     <li>Center stone: $800 × 2.65 = $2,120</li>
                     <li>Side stones: 0.3 × $250 = $75</li>
-                    <li><strong>Total: $411.76 + $2,120 + $75 = $2,606.76</strong></li>
+                    <li>Pre-shipping total: $411.76 + $2,120 + $75 = $2,606.76</li>
+                    <li>Platform-adjusted total: $2,606.76 ÷ {PLATFORM_FEE_RATE} = $3,066.78</li>
+                    <li><strong>Final price (incl. shipping): $3,066.78 + $100 = $3,166.78</strong></li>
                   </ul>
                 </div>
               </section>
