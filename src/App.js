@@ -19,7 +19,7 @@ function App() {
   const [showAllPricing, setShowAllPricing] = useState(false);
 
   // Live prices and charges ---------------------------------------------------
-  const USD_TO_INR = 89;
+  const USD_TO_INR = 90;
   const GOLD_CONFIG = {
     livePrice: 17000,
     labourCharge: 1000,
@@ -276,7 +276,7 @@ function App() {
   // Responsive: for mobile, render all left sections, then all right sections, then submit
   return (
     <div className="app-container">
-      <h1>Price Calculator</h1>
+      <h1>Price Calculator 16/02/2026</h1>
       <form className="main-content" onSubmit={handleSubmit} id="main-content">
         {/* Left container: Form sections */}
         <div className="left-container">
