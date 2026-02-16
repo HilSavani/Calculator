@@ -21,12 +21,12 @@ function App() {
   // Live prices and charges ---------------------------------------------------
   const USD_TO_INR = 89;
   const GOLD_CONFIG = {
-    livePrice: 13000,
+    livePrice: 17000,
     labourCharge: 1000,
     markup: 2.5,
   };
   const PLATINUM_CONFIG = {
-    livePrice: 6000,
+    livePrice: 10000,
     labourCharge: 2000,
     purity: 0.95,
     markup: 3,
@@ -452,7 +452,7 @@ function App() {
             <section className="form-section">
               <div className="section-title">
                 Pricing methodology
-                <button 
+                <button
                   type="button"
                   className="info-button"
                   onClick={() => setShowDocumentation(true)}
@@ -525,7 +525,7 @@ function App() {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>Pricing Methodology Documentation</h2>
-              <button 
+              <button
                 className="modal-close"
                 onClick={() => setShowDocumentation(false)}
                 aria-label="Close documentation"
@@ -612,7 +612,7 @@ function App() {
                     </tbody>
                   </table>
                   <div className="load-more-container">
-                    <button 
+                    <button
                       className="load-more-btn"
                       onClick={() => setShowAllPricing(!showAllPricing)}
                     >
